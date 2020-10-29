@@ -29,4 +29,10 @@ sub LATEST_VERSION {
     $version;
 }
 
+sub IS_USE_RSTAR {
+    my ($class, $dir) = @_;
+    return ! -f "$dir/Configure.pl";
+}
+
+
 1;
