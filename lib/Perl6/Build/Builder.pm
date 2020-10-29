@@ -6,6 +6,7 @@ use IPC::Run3 ();
 use File::Temp ();
 use File::pushd ();
 use File::Spec;
+use Perl6::Build::Helper;
 
 sub new {
     my ($class, %args) = @_;
@@ -24,12 +25,27 @@ sub build {
 
     die "There already exists $prefix\n" if -e $prefix;
 
-    if (!grep { $_ eq "--make-install" } @option) {
-        unshift @option, "--make-install";
-    }
-    unshift @option, "--prefix", $prefix;
+    my $is_use_rstar = Perl6::Build::Helper->IS_USE_RSTAR(".");
+    my $prefix_option = "-p";
 
-    my @cmd = ($^X, "Configure.pl", @option);
+    unless ($is_use_rstar) {
+      $prefix_option = "--prefix";
+      if (!grep { $_ eq "--make-install" } @option) {
+          unshift @option, "--make-install";
+      }
+    }
+    push @option, $prefix_option, $prefix;
+
+    my @cmd = ();
+
+    if ($is_use_rstar) {
+      push @cmd, "/bin/bash", "./bin/rstar", "install";
+    } else {
+      push @cmd, $^X, "Configure.pl";
+    }
+
+    push(@cmd, @option);
+
     warn "Running @cmd\n";
     warn "\n  See " . $self->{log_file} . " for progress\n\n";
     my $guard = File::pushd::pushd $dir;

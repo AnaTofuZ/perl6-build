@@ -79,12 +79,20 @@ sub _unpack {
 
 sub build {
     my ($self, $prefix, @option) = @_;
+
+    my $backend_option = "--backends";
+    my $gen_option = '--gen-moar';
+
     if (!@option) {
         if ($self->{backend} eq 'jvm') {
-            @option = qw(--backends jvm --gen-nqp);
-        } else {
-            @option = qw(--backends moar --gen-moar);
+             $gen_option = "--gen-nqp";
         }
+        if (Perl6::Build::Helper->IS_USE_RSTAR($self->{dir})) {
+          $backend_option = "-b";
+          $gen_option = "";
+        }
+        @option = ($backend_option, $self->{backend});
+        push @option, $gen_option if $gen_option;
     }
     my $builder = Perl6::Build::Builder->new(log_file => $self->{log_file});
     $builder->build($self->{dir}, $prefix, @option);
