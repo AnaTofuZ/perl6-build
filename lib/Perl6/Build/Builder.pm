@@ -25,7 +25,7 @@ sub build {
 
     die "There already exists $prefix\n" if -e $prefix;
 
-    my $is_use_rstar = Perl6::Build::Helper->IS_USE_RSTAR(".");
+    my $is_use_rstar = Perl6::Build::Helper->IS_USE_RSTAR($dir);
     my $prefix_option = "-p";
 
     unless ($is_use_rstar) {
